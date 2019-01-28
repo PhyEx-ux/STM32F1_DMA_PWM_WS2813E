@@ -125,7 +125,7 @@ void WS2812_send(uint8_t (*color)[3], uint16_t len)
 		DMA_Cmd(DMA1_Channel2, ENABLE); 			// enable DMA channel 6
 		TIM_Cmd(TIM2, ENABLE); 						// enable Timer 3
 		while(!DMA_GetFlagStatus(DMA1_FLAG_TC2)) ; 	// wait until transfer complete
-		TIM_Cmd(TIM2, DISABLE); 	// disable Timer 3 这个位置好像勉强正常 但是还是会遇到第一个LED轻微闪烁的BUG MDZZ
+		TIM_Cmd(TIM2, DISABLE); 	// disable Timer 3
 		DMA_Cmd(DMA1_Channel2, DISABLE); 			// disable DMA channel 6
 //		TIM_Cmd(TIM2, DISABLE); 	// disable Timer 3
 		DMA_ClearFlag(DMA1_FLAG_TC2); 				// clear DMA1 Channel 6 transfer complete flag
