@@ -11,6 +11,7 @@
 *.ilk
 *.map
 *.exp
+*.lst
 
 # Precompiled Headers
 *.gch
@@ -50,3 +51,16 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+#项目工程文件
+*.uvprojx
+*.uvoptx
+*.ini
+*.dbgconf
+*.json
+*.sqlite
+*.ipch
+*.VC
+
+#编译目标文件
+*.hex
