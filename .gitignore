@@ -64,3 +64,5 @@ dkms.conf
 
 #编译目标文件
 *.hex
+*.db
+*.opendb
