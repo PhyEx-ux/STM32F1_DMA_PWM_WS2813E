@@ -66,3 +66,4 @@ dkms.conf
 *.hex
 *.db
 *.opendb
+/.vs/STM32F1_DMA_PWM_WS2813E/v15/.suo
