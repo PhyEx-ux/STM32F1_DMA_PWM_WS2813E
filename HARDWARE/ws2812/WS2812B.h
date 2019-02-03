@@ -8,5 +8,6 @@
 
 void Timer2_init(void);
 void WS2812_send(uint8_t (*color)[3], uint16_t len);
+void WS2812_send_line(uint8_t(*color)[53][3]);
 
 #endif /* __LED_H */

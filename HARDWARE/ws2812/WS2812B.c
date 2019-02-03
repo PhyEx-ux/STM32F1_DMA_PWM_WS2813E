@@ -16,6 +16,8 @@
 	
 #define TIMING_ONE  50
 #define TIMING_ZERO 25
+
+ uint8_t HDD_Path_Flag = 0;
  uint16_t LED_BYTE_Buffer[300];
 //---------------------------------------------------------------//
 
@@ -85,7 +87,7 @@ void Timer2_init(void)
  */
 void WS2812_send(uint8_t (*color)[3], uint16_t len)
 {
-	uint8_t i;
+	uint8_t i,j;
 	uint16_t memaddr;
 	uint16_t buffersize;
 	buffersize = (len*24)+43;	// number of bytes needed is #LEDs * 24 bytes + 42 trailing bytes
@@ -93,7 +95,11 @@ void WS2812_send(uint8_t (*color)[3], uint16_t len)
 
 	while (len)
 	{	
-		for(i=0; i<8; i++) // GREEN data
+		if(len == 1 && HDD_Path_Flag) //加入HDD_PATH
+		{
+			color[0] = HDD_LED;
+		}
+		for(i=0; i<8; i++) // GREEN
 		{
 			LED_BYTE_Buffer[memaddr] = ((color[0][1]<<i) & 0x0080) ? TIMING_ONE:TIMING_ZERO;
 			memaddr++;
@@ -111,10 +117,17 @@ void WS2812_send(uint8_t (*color)[3], uint16_t len)
 		len--;
 	}
 //===================================================================//	
-//bug：最后一个周期波形不知道为什么全是高电平，故增加一个波形
-  	LED_BYTE_Buffer[memaddr] = ((color[0][2]<<8) & 0x0080) ? TIMING_ONE:TIMING_ZERO;
-	memaddr++;
-//===================================================================//	
+/*
+		//修正特殊BUG的波形
+	  LED_BYTE_Buffer[memaddr] = ((color[0][1] << 8) & 0x0080) ? TIMING_ONE : TIMING_ZERO;
+	  memaddr++;
+
+	  LED_BYTE_Buffer[memaddr] = ((color[0][0] << 8) & 0x0080) ? TIMING_ONE : TIMING_ZERO;
+	  memaddr++;
+
+	  LED_BYTE_Buffer[memaddr] = ((color[0][2] << 8) & 0x0080) ? TIMING_ONE : TIMING_ZERO;
+	  memaddr++;
+//===================================================================*/	
 
 		while(memaddr < buffersize)
 		{
@@ -130,6 +143,68 @@ void WS2812_send(uint8_t (*color)[3], uint16_t len)
 		DMA_Cmd(DMA1_Channel2, DISABLE); 			// disable DMA channel 6
 //		TIM_Cmd(TIM2, DISABLE); 	// disable Timer 3
 		DMA_ClearFlag(DMA1_FLAG_TC2); 				// clear DMA1 Channel 6 transfer complete flag
+//		TIM_Cmd(TIM2, DISABLE); 	// disable Timer 3
+}
+
+void WS2812_send_line(uint8_t(*color)[53][3])
+{
+	uint8_t i,linelen,;
+	uint16_t memaddr;
+	uint16_t buffersize;
+	buffersize = ((linelen-1)* 24) + 43;	// number of bytes needed is #LEDs * 24 bytes + 42 trailing bytes
+	linelen = 53;                           //设定循环次数，数值为接收到数组长度
+	memaddr = 0;				// reset buffer memory index
+
+	while (linelen++)
+	{
+		if (len == 1 && HDD_Path_Flag) //加入HDD_PATH
+		{
+			color[linelen] = HDD_LED;
+		}
+		for (i = 0; i < 8; i++) // GREEN
+		{
+			LED_BYTE_Buffer[memaddr] = ((color[linelen][1] << i) & 0x0080) ? TIMING_ONE : TIMING_ZERO;
+			memaddr++;
+		}
+		for (i = 0; i < 8; i++) // RED
+		{
+			LED_BYTE_Buffer[memaddr] = ((color[linelen][0] << i) & 0x0080) ? TIMING_ONE : TIMING_ZERO;
+			memaddr++;
+		}
+		for (i = 0; i < 8; i++) // BLUE
+		{
+			LED_BYTE_Buffer[memaddr] = ((color[linelen][2] << i) & 0x0080) ? TIMING_ONE : TIMING_ZERO;
+			memaddr++;
+		}
+		len--;
+	}
+	//===================================================================//	
+	/*
+			//修正特殊BUG的波形
+		  LED_BYTE_Buffer[memaddr] = ((color[0][1] << 8) & 0x0080) ? TIMING_ONE : TIMING_ZERO;
+		  memaddr++;
+
+		  LED_BYTE_Buffer[memaddr] = ((color[0][0] << 8) & 0x0080) ? TIMING_ONE : TIMING_ZERO;
+		  memaddr++;
+
+		  LED_BYTE_Buffer[memaddr] = ((color[0][2] << 8) & 0x0080) ? TIMING_ONE : TIMING_ZERO;
+		  memaddr++;
+	//===================================================================*/
+
+	while (memaddr < buffersize)
+	{
+		LED_BYTE_Buffer[memaddr] = 0;
+		memaddr++;
+	}
+
+	DMA_SetCurrDataCounter(DMA1_Channel2, buffersize); 	// load number of bytes to be transferred
+	DMA_Cmd(DMA1_Channel2, ENABLE); 			// enable DMA channel 6
+	TIM_Cmd(TIM2, ENABLE); 						// enable Timer 3
+	while (!DMA_GetFlagStatus(DMA1_FLAG_TC2)); 	// wait until transfer complete
+	TIM_Cmd(TIM2, DISABLE); 	// disable Timer 3   这个位置好像勉强正常 但是还是会遇到第一个LED轻微闪烁的BUG MDZZ
+	DMA_Cmd(DMA1_Channel2, DISABLE); 			// disable DMA channel 6
+//		TIM_Cmd(TIM2, DISABLE); 	// disable Timer 3
+	DMA_ClearFlag(DMA1_FLAG_TC2); 				// clear DMA1 Channel 6 transfer complete flag
 //		TIM_Cmd(TIM2, DISABLE); 	// disable Timer 3
 }
 
