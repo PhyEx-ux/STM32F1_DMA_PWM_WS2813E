@@ -151,7 +151,7 @@ void WS2812_send_line(uint8_t(*color)[53][3])
 	uint8_t i,linelen,;
 	uint16_t memaddr;
 	uint16_t buffersize;
-	buffersize = ((linelen-1)* 24) + 43;	// number of bytes needed is #LEDs * 24 bytes + 42 trailing bytes
+	buffersize = (linelen * 24) + 43;	// number of bytes needed is #LEDs * 24 bytes + 42 trailing bytes
 	linelen = 53;                           //设定循环次数，数值为接收到数组长度
 	memaddr = 0;				// reset buffer memory index
 
