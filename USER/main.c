@@ -38,7 +38,7 @@ u16 i,j;
  {	
 	delay_init();	    //延时函数初始化	  
 	Timer2_init();		//WS2812B驱动初始化   定时器2 输出引脚PA0
-	HDD_EXTI_Init();	//HDD_PATH中断初始化  输入引脚PA15
+	HDD_EXTI_Init();	//HDD_PATH中断初始化  输入引脚PA4
 	KEY_Init();         //初始化按键          输入引脚PA2
 
 	while(1)

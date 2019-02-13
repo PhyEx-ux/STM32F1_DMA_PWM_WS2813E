@@ -12,7 +12,7 @@ void KEY_Init(void)
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE); //GPIOE时钟
 
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2; // KEY 对应引脚
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;//50
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;//2Mhz
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;//上拉
 	GPIO_Init(GPIOE, &GPIO_InitStructure);//初始化GPIOE2,3,4
 
@@ -22,13 +22,11 @@ void KEY_Init(void)
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE); ///使能TIM3时钟
 
-	TIM_TimeBaseInitStructure.TIM_Period = 100; 	//定时器溢出上限 //大概每ms溢出一次
-	TIM_TimeBaseInitStructure.TIM_Prescaler = 72 - 1; //定时器分频
+	TIM_TimeBaseInitStructure.TIM_Period = 36; 	//定时器溢出上限 大概每ms溢出一次
+	TIM_TimeBaseInitStructure.TIM_Prescaler = 2000 - 1; //定时器分频 
 	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; //向上计数模式
 	TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-
 	TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure); //初始化TIM3
-
 	TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE); //允许定时器3更新中断
 	TIM_Cmd(TIM3, ENABLE); //使能定时器3
 

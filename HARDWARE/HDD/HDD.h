@@ -6,6 +6,6 @@
 //#define HDD_IN_PIN PA15
 
 void HDD_EXTI_Init(void);
-void EXTI15_10_IRQHandler(void);
+void EXTI4_IRQHandler(void);
 
 #endif /* __LED_H */
