@@ -23,7 +23,7 @@
 
 void Timer2_init(void)
 {
-	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
+  TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
   TIM_OCInitTypeDef  TIM_OCInitStructure;
   GPIO_InitTypeDef GPIO_InitStructure;
   DMA_InitTypeDef DMA_InitStructure;
@@ -98,6 +98,7 @@ void WS2812_send(uint8_t (*color)[3], uint16_t len)
 		if(len == 1 && HDD_Path_Flag) //加入HDD_PATH
 		{
 			color[0] = HDD_LED;
+			HDD_Path_Flag = 0; //复位硬盘操作标识符
 		}
 		for(i=0; i<8; i++) // GREEN
 		{
@@ -146,20 +147,22 @@ void WS2812_send(uint8_t (*color)[3], uint16_t len)
 //		TIM_Cmd(TIM2, DISABLE); 	// disable Timer 3
 }
 
-void WS2812_send_line(uint8_t(*color)[53][3])
+void WS2812_send_line(uint8_t(*color)[53][3]) //本函数理论上可以将一组二维数组变换成RGB队列发送至引脚PA1
 {
-	uint8_t i,linelen,;
+	uint8_t i;
+	int16_t linelen;
 	uint16_t memaddr;
 	uint16_t buffersize;
 	buffersize = (linelen * 24) + 43;	// number of bytes needed is #LEDs * 24 bytes + 42 trailing bytes
-	linelen = 53;                           //设定循环次数，数值为接收到数组长度
+	linelen = 53;                           //数值为接收到数组长度-1
 	memaddr = 0;				// reset buffer memory index
 
-	while (linelen++)
+	while (linelen >= 0)
 	{
 		if (len == 1 && HDD_Path_Flag) //加入HDD_PATH
 		{
 			color[linelen] = HDD_LED;
+			HDD_Path_Flag = 0;   //复位硬盘操作标识符
 		}
 		for (i = 0; i < 8; i++) // GREEN
 		{
@@ -176,7 +179,7 @@ void WS2812_send_line(uint8_t(*color)[53][3])
 			LED_BYTE_Buffer[memaddr] = ((color[linelen][2] << i) & 0x0080) ? TIMING_ONE : TIMING_ZERO;
 			memaddr++;
 		}
-		len--;
+		linelen--;
 	}
 	//===================================================================//	
 	/*
